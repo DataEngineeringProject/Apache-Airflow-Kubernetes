@@ -12,6 +12,7 @@ from include.datasets import DATASET_COCKTAIL
      dagrun_timeout=duration(minutes=20),
      max_consecutive_failed_dag_runs=2)
 
+# Consumer
 def ecom():
 
     ta = EmptyOperator(task_id='ta')
