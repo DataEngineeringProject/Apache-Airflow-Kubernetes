@@ -7,8 +7,9 @@ from include.extractor.callbacks import _handle_empty_size, _handle_failed_dag_r
 import json
 from airflow.utils.trigger_rule import TriggerRule
 
+# Producer DAG
 @dag(
-    start_date=datetime(2025, 5, 7),
+    start_date=datetime(2025, 5, 10),
     schedule='@daily',
     default_args={
         'retries': 2,

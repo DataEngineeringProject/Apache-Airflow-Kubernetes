@@ -3,7 +3,8 @@ from airflow.operators.empty import EmptyOperator
 from pendulum import datetime, duration
 from include.datasets import DATASET_COCKTAIL
 
-@dag(start_date=datetime(2025, 5 ,7),
+# Consumer DAG
+@dag(start_date=datetime(2025, 5 ,10),
      schedule=[DATASET_COCKTAIL],
      catchup=True,
      description="This DAG processes ecommerce data",
@@ -12,7 +13,6 @@ from include.datasets import DATASET_COCKTAIL
      dagrun_timeout=duration(minutes=20),
      max_consecutive_failed_dag_runs=2)
 
-# Consumer
 def ecom():
 
     ta = EmptyOperator(task_id='ta')
