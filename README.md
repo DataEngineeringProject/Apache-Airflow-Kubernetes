@@ -61,4 +61,24 @@ from airflow.models import Variable
 
 api = Variable.get('api')
 ```
-#### Kubernetes Executor GitSync
+#### Kubernetes Executor + GitSync
+Kubernetes automates many aspects of deploying, managing, and scaling containerized applications using helm as a package manager.
+- Helm is an open source package manager that makes it simple and consistent to automate software deployment for Kubernetes .It makes it easy to package applications for Kubernetes and deploy them with a few commands
+- The Kubernetes Executor allows you to run all the Airflow tasks on Kubernetes as separate Pods
+- Install helm to the kubernetes environment `helm repo add apache-airflow https://airflow.apache.org` and then update helm `helm repo update`
+- Create a namespace for airflow to spin out resources `kubectl create namespace airflow` then verify `kubectl get namespaces`
+- Install helm chart in the project namespace `helm install airflow apache-airflow/airflow --namespace airflow --debug`
+- Check for provisioned pods for airflow `kubectl get pods -n airflow`
+- Access the Airflow UI `a.k.a` port forwarding to your local environment in another tab `kubectl port-forward svc/airflow-webserver 8080:8080 --namespace airflow`
+##### Helm Update for Airflow Dags 
+- After setting up the environment, configure helm application deployments for airflow in the temp folder `/tmp` -> `mkdir airflow-k8s` by modifiying`value.yaml file`
+- Run`helm show values apache-airflow/airflow > values.yaml` inside `airflow-k8s` to store values
+- Open the values file in vscode for version changes and run helm to upgrade `helm upgrade airflow apache-airflow/airflow -n airflow -f values.yaml --debug`
+##### GitSync airflow - SideCar container
+- Open the `values.yaml` file and update the `GitSync` section
+- Start by enabling `gitSync`, then add the `repo` containing the dags files, `branch=main`, `ref=main` and `subPath=/dags`
+- Create ssh-key in the folder `airflow-k8s` to connect GitHub`ssh-keygen -t ed25519 -C "lawrence"` and then add the created public key for the project repo on GitHub
+- Verify Github connection using you private key and clone the repo from GitHub 
+- Create a kubernetes ssh-secret for airflow `kubectl create secret generic airflow-ssh-secret --from-key=PRIVATE_KEY -n airflow`
+- Upgrade the airflow deployment `helm upgrade airflow apache-airflow/airflow -n airflow -f values.yaml --debug`
+- Re-run the airflow UI `kubectl port-forward svc/airflow-webserver 8080:8080 --namespace airflow`
