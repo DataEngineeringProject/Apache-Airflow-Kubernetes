@@ -82,3 +82,20 @@ Kubernetes automates many aspects of deploying, managing, and scaling containeri
 - Create a kubernetes ssh-secret for airflow `kubectl create secret generic airflow-ssh-secret --from-key=PRIVATE_KEY -n airflow`
 - Upgrade the airflow deployment `helm upgrade airflow apache-airflow/airflow -n airflow -f values.yaml --debug`
 - Re-run the airflow UI `kubectl port-forward svc/airflow-webserver 8080:8080 --namespace airflow`
+##### Setting up Rancher for Kubernetes on AWS
+- Create an EC2 instance with 2GB storage and SSH into the instance using the webrowser
+- Start by updating the instance `sudo yum update -y ` and then install the community version of docker `sudo amazon-linux-extras install docker`
+- Start the docker service `sudo service docker start` and add user to the docker group `sudo usermod -a - G docker ec2-user`
+- Start `Rancher` on the instance `docker run -d --restart=unless-stopped --name rancher --hostname rancher -p 80:80 -p 443:443 rancher/rancher:v2.3.2`
+- Launch rancher using the ec2-instance IP_Address
+##### Rancher User on IAM, ECR and EKS Cluster
+- Create a user for the EKS cluster with programmatic access and attach existing policies `AdministratorAccess`
+- Create an ECR repo to store, manage and deploy docker images for Airflow DAGS 
+- Install the AWS CLI for your operating system `https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html`
+- Create an AWS cluster on Rancher -> Add AWS Access Configuration Credentials a.k.a `Access Key` and `Secret Access Key` and choose the version of kubernetes
+- Check for the cluster status from `CloudFormation console` or `EKS console` 
+- `NOTE:` To access the cluster, it's preferably better to use Ingress for outside traffic
+- Enable the `Nginx Ingress with Catalogs(HELM)` using the Rancher dashboard -> Enable Global Helm Master
+- Install `nginx-ingress` from managed catalogs: `name`, `default project`, `availble roles = Cluster`
+- Configure the kubernetes cluster from the catalogs: `add catalog`and URL `https://github.com/marclamberti/airflow-helm-chart.git`, `branch = master` and `scope = global` and the install `airflow-k8s-Eks`
+-` NOTE: CleanUp` -> Delete Rancher Cluster from global, navigate to AWS EKS and CloudFormation to check the deleting process, then delete the EC2 instance, VPC created by Rancher and loadbalancer
