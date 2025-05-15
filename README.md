@@ -61,7 +61,7 @@ from airflow.models import Variable
 
 api = Variable.get('api')
 ```
-#### Kubernetes Executor + GitSync
+### Kubernetes Executor + GitSync
 Kubernetes automates many aspects of deploying, managing, and scaling containerized applications using helm as a package manager.
 - Helm is an open source package manager that makes it simple and consistent to automate software deployment for Kubernetes .It makes it easy to package applications for Kubernetes and deploy them with a few commands
 - The Kubernetes Executor allows you to run all the Airflow tasks on Kubernetes as separate Pods
@@ -78,7 +78,7 @@ Kubernetes automates many aspects of deploying, managing, and scaling containeri
 - Open the `values.yaml` file and update the `GitSync` section
 - Start by enabling `gitSync`, then add the `repo` containing the dags files, `branch=main`, `ref=main` and `subPath=/dags`
 - Create ssh-key in the folder `airflow-k8s` to connect GitHub`ssh-keygen -t ed25519 -C "lawrence"` and then add the created public key for the project repo on GitHub
-- Verify Github connection using you private key and clone the repo from GitHub 
+- Verify Github connection using you private key and clone the repo from GitHub `ssh -i airflow-repo -T git@github.com`
 - Create a kubernetes ssh-secret for airflow `kubectl create secret generic airflow-ssh-secret --from-key=PRIVATE_KEY -n airflow`
 - Upgrade the airflow deployment `helm upgrade airflow apache-airflow/airflow -n airflow -f values.yaml --debug`
 - Re-run the airflow UI `kubectl port-forward svc/airflow-webserver 8080:8080 --namespace airflow`
@@ -88,7 +88,7 @@ Kubernetes automates many aspects of deploying, managing, and scaling containeri
 - Start the docker service `sudo service docker start` and add user to the docker group `sudo usermod -a - G docker ec2-user`
 - Start `Rancher` on the instance `docker run -d --restart=unless-stopped --name rancher --hostname rancher -p 80:80 -p 443:443 rancher/rancher:v2.3.2`
 - Launch rancher using the ec2-instance IP_Address
-##### Rancher User on IAM, ECR and EKS Cluster
+### Rancher User on IAM, ECR and EKS Cluster
 - Create a user for the EKS cluster with programmatic access and attach existing policies `AdministratorAccess`
 - Create an ECR repo to store, manage and deploy docker images for Airflow DAGS 
 - Install the AWS CLI for your operating system `https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html`
